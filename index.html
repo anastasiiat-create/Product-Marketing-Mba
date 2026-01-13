@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advent Calendar</title>
+
+  <style>
+    :root{
+      --bg1:#fff6fb;
+      --bg2:#f3f8ff;
+      --ink:#2b2b2b;
+      --muted:#6b6b6b;
+      --pink:#ff69b4;
+      --pink2:#ff4aa3;
+      --shadow: 0 12px 28px rgba(0,0,0,.10);
+      --shadow2: 0 10px 20px rgba(255,105,180,.15);
+      --radius: 18px;
+    }
+
+    *{ box-sizing:border-box; }
+    html, body { height:100%; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(900px 500px at 20% 15%, rgba(255,105,180,.18), transparent 60%),
+        radial-gradient(900px 500px at 85% 25%, rgba(120,180,255,.18), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 430px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .hero {
+      background: rgba(255,255,255,.75);
+      backdrop-filter: blur(8px);
+      border-radius: 22px;
+      padding: 16px 16px 14px;
+      box-shadow: var(--shadow2);
+      border: 1px solid rgba(255,105,180,.20);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:-60px -40px auto auto;
+      width: 160px;
+      height: 160px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,105,180,.35), transparent 60%);
+      transform: rotate(15deg);
+      border-radius: 999px;
+    }
+    .hero::after{
+      content:"";
+      position:absolute;
+      inset:auto auto -60px -50px;
+      width: 190px;
+      height: 190px;
+      background: radial-gradient(circle at 30% 30%, rgba(120,180,255,.35), transparent 62%);
+      transform: rotate(-10deg);
+      border-radius: 999px;
+    }
+
+    .hero h1{
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.2;
+      letter-spacing: .2px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .sparkle {
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      color: var(--pink2);
+      font-weight: 800;
+    }
+
+    .advent-selection, .form-container {
+      background-color: rgba(255,255,255,.85);
+      backdrop-filter: blur(8px);
+      border-radius: 22px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(0,0,0,.06);
+    }
+
+    .section-title{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 2px 2px 12px;
+    }
+
+    .section-title h2{
+      margin:0;
+      font-size: 16px;
+      letter-spacing:.2px;
+    }
+
+    .pill {
+      font-size: 12px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      padding: 6px 10px;
+      border-radius: 999px;
+      box-shadow: 0 10px 18px rgba(255,105,180,.25);
+      white-space: nowrap;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .advent-card{
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 10px 18px rgba(0,0,0,.08);
+      border: 1px solid rgba(0,0,0,.06);
+      cursor: pointer;
+      transform: translateZ(0);
+      transition: transform .12s ease, box-shadow .12s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .advent-card:active{
+      transform: scale(.985);
+      box-shadow: 0 8px 16px rgba(0,0,0,.10);
+    }
+
+    .advent-img{
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display:block;
+      filter: saturate(1.05);
+    }
+
+    .advent-info{
+      padding: 12px;
+      display:flex;
+      align-items:flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .advent-name{
+      margin:0;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .advent-desc{
+      margin: 3px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .choose-btn{
+      border: none;
+      background: rgba(255,105,180,.12);
+      color: var(--pink2);
+      font-weight: 800;
+      padding: 8px 10px;
+      border-radius: 12px;
+      cursor:pointer;
+    }
+
+    .choose-btn:active{ transform: scale(.98); }
+
+    .badge{
+      position:absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(0,0,0,.06);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+      color: var(--pink2);
+      box-shadow: 0 10px 18px rgba(0,0,0,.06);
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+
+    .form-container input {
+      width: 100%;
+      padding: 12px 12px;
+      margin: 10px 0;
+      border: 2px solid rgba(255,105,180,.45);
+      border-radius: 14px;
+      font-size: 16px;
+      outline: none;
+      background: rgba(255,255,255,.9);
+    }
+
+    .form-container input:focus{
+      border-color: var(--pink2);
+      box-shadow: 0 0 0 4px rgba(255,105,180,.18);
+    }
+
+    .form-container button {
+      margin-top: 10px;
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      color: white;
+      border: none;
+      padding: 13px;
+      width: 100%;
+      font-size: 16px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 900;
+      box-shadow: 0 14px 22px rgba(255,105,180,.25);
+    }
+
+    .form-container button:active{ transform: scale(.99); }
+
+    .back {
+      margin-top: 10px;
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      font-weight: 800;
+      color: var(--pink2);
+      cursor:pointer;
+      user-select:none;
+    }
+
+    .confetti {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      display: none;
+    }
+    .confetti div {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      animation: confetti-fall 2.4s linear infinite;
+      opacity: .95;
+    }
+    @keyframes confetti-fall {
+      0%   { transform: translateY(-120px) rotate(0deg); }
+      100% { transform: translateY(110vh) rotate(360deg); }
+    }
+
+    @media (max-height: 700px){
+      .advent-img{ height: 165px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <header class="hero">
+      <h1><span class="sparkle">✨ Pick Your Advent</span></h1>
+    </header>
+
+    <!-- PAGE 1 -->
+    <section class="advent-selection" id="adventPage">
+      <div class="section-title">
+        <h2>Choose an Advent</h2>
+        <div class="pill">mobile friendly</div>
+      </div>
+
+      <div class="grid">
+        <div class="advent-card" onclick="chooseAdvent(1)">
+          <div class="badge">🎁 #1</div>
+          <img class="advent-img" src="https://i.pinimg.com/736x/8b/a5/2a/8ba52a8621ca7a3e8eb4ca52cbd4b95e.jpg" alt="Advent Calendar 1">
+          <div class="advent-info">
+            <div>
+              <p class="advent-name">Candy Dream Advent</p>
+              <p class="advent-desc">Sweet & pink vibes inside ✨</p>
+            </div>
+            <button class="choose-btn" type="button" onclick="event.stopPropagation(); chooseAdvent(1)">Pick</button>
+          </div>
+        </div>
+
+        <div class="advent-card" onclick="chooseAdvent(2)">
+          <div class="badge">🌟 #2</div>
+          <img class="advent-img" src="https://i.pinimg.com/1200x/87/1e/5c/871e5c01142f8dec51267b4cb02dae43.jpg" alt="Advent Calendar 2">
+          <div class="advent-info">
+            <div>
+              <p class="advent-name">Cozy Winter Advent</p>
+              <p class="advent-desc">Warm cozy mood + surprises ❄️</p>
+            </div>
+            <button class="choose-btn" type="button" onclick="event.stopPropagation(); chooseAdvent(2)">Pick</button>
+          </div>
+        </div>
+
+        <div class="advent-card" onclick="chooseAdvent(3)">
+          <div class="badge">🧸 #3</div>
+          <img class="advent-img" src="https://i.pinimg.com/736x/b3/83/51/b38351237d61f173c0d3c80b8b625fc2.jpg" alt="Advent Calendar 3">
+          <div class="advent-info">
+            <div>
+              <p class="advent-name">Kawaii Surprise Advent</p>
+              <p class="advent-desc">Cute overload + tiny gifts 💖</p>
+            </div>
+            <button class="choose-btn" type="button" onclick="event.stopPropagation(); chooseAdvent(3)">Pick</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 2 -->
+    <section class="form-container" id="formPage" style="display:none;">
+      <form id="advent-form">
+        <label for="name" style="font-weight:900;">Name:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="phone" style="font-weight:900;">Phone Number:</label>
+        <input type="tel" id="phone" name="phone" required>
+
+        <button type="submit">Get insights ✨</button>
+      </form>
+
+      <div class="back" onclick="goBack()">← Back to Advents</div>
+    </section>
+  </div>
+
+  <div class="confetti" id="confetti"></div>
+
+  <script>
+    function chooseAdvent(advent) {
+      localStorage.setItem('chosenAdvent', advent);
+      document.getElementById('adventPage').style.display = 'none';
+      document.getElementById('formPage').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function goBack(){
+      document.getElementById('formPage').style.display = 'none';
+      document.getElementById('adventPage').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    const confettiColors = ["#ff69b4","#ff4aa3","#ffd166","#7bdff2","#bdb2ff","#caffbf"];
+
+    function makeConfetti(count=120){
+      const confetti = document.getElementById('confetti');
+      confetti.innerHTML = "";
+      confetti.style.display = 'block';
+
+      for (let i = 0; i < count; i++) {
+        const piece = document.createElement('div');
+        piece.style.left = (Math.random() * 100) + "%";
+        piece.style.top = (-20 - Math.random()*200) + "px";
+        piece.style.width = (6 + Math.random()*8) + "px";
+        piece.style.height = (6 + Math.random()*10) + "px";
+        piece.style.background = confettiColors[Math.floor(Math.random()*confettiColors.length)];
+        piece.style.borderRadius = (Math.random() > 0.5) ? "999px" : "3px";
+        piece.style.animationDuration = (1.8 + Math.random()*1.6) + "s";
+        piece.style.animationDelay = (Math.random()*0.8) + "s";
+        piece.style.transform = `rotate(${Math.random()*360}deg)`;
+        confetti.appendChild(piece);
+      }
+    }
+
+    document.getElementById('advent-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      makeConfetti(140);
+
+      setTimeout(() => {
+        alert('Thank you! Your request is sent 💖');
+        document.getElementById('confetti').style.display = 'none';
+        document.getElementById('confetti').innerHTML = "";
+        document.getElementById('advent-form').reset();
+        goBack();
+      }, 2500);
+    });
+  </script>
+</body>
+</html>
